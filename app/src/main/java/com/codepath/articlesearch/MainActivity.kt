@@ -1,17 +1,13 @@
 package com.codepath.articlesearch
 
+import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.fragment.app.Fragment
 import com.codepath.articlesearch.databinding.ActivityMainBinding
-import com.codepath.asynchttpclient.AsyncHttpClient
-import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.serialization.json.Json
-import okhttp3.Headers
-import org.json.JSONException
 
 fun createJson() = Json {
     isLenient = true
@@ -20,14 +16,14 @@ fun createJson() = Json {
 }
 
 private const val TAG = "MainActivity/"
-private const val SEARCH_API_KEY = BuildConfig.API_KEY
-private const val ARTICLE_SEARCH_URL =
-    "https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=${SEARCH_API_KEY}"
+private const val PREFS_NAME = "AppPrefs"
+private const val KEY_BACKGROUND_COLOR = "background_color"
+private const val DEFAULT_COLOR = Color.WHITE
+private var TOGGLE_COLOR = Color.parseColor("#FFBB86FC") // Pick any color
 
 class MainActivity : AppCompatActivity() {
-    private val articles = mutableListOf<Article>()
-    private lateinit var articlesRecyclerView: RecyclerView
     private lateinit var binding: ActivityMainBinding
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,42 +32,42 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        articlesRecyclerView = findViewById(R.id.articles)
-        val articleAdapter = ArticleAdapter(this, articles)
-        articlesRecyclerView.adapter = articleAdapter
-        articlesRecyclerView.layoutManager = LinearLayoutManager(this).also {
-            val dividerItemDecoration = DividerItemDecoration(this, it.orientation)
-            articlesRecyclerView.addItemDecoration(dividerItemDecoration)
+        // Initialize SharedPreferences
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+
+        // Apply saved background color
+        val savedColor = sharedPreferences.getInt(KEY_BACKGROUND_COLOR, DEFAULT_COLOR)
+        binding.root.setBackgroundColor(savedColor)
+
+        val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
+
+        bottomNavigationView.setOnItemSelectedListener { item ->
+            val fragment: Fragment = when (item.itemId) {
+                R.id.nav_books -> BestSellerBooksFragment()
+                R.id.nav_articles -> ArticleListFragment()
+                R.id.nav_settings -> SettingsFragment()
+                R.id.nav_home -> HomeFragment()
+                else -> return@setOnItemSelectedListener false
+            }
+            replaceFragment(fragment)
+            true
         }
 
-        val client = AsyncHttpClient()
-        client.get(ARTICLE_SEARCH_URL, object : JsonHttpResponseHandler() {
-            override fun onFailure(
-                statusCode: Int,
-                headers: Headers?,
-                response: String?,
-                throwable: Throwable?
-            ) {
-                Log.e(TAG, "Failed to fetch articles: $statusCode")
-            }
+        // Set default selection
+        bottomNavigationView.selectedItemId = R.id.nav_books
+    }
 
-            override fun onSuccess(statusCode: Int, headers: Headers, json: JSON) {
-                Log.i(TAG, "Successfully fetched articles: $json")
-                try {
-                    val parsedJson = createJson().decodeFromString(
-                        SearchNewsResponse.serializer(),
-                        json.jsonObject.toString()
-                    )
-                    parsedJson.response?.docs?.let { list ->
-                        articles.addAll(list)
-                        articleAdapter.notifyDataSetChanged()
-                    }
-                } catch (e: JSONException) {
-                    Log.e(TAG, "Exception: $e")
-                }
-            }
+    private fun replaceFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.article_frame_layout, fragment)
+            .commit()
+    }
 
-        })
+    fun toggleBackgroundColor() {
+        val currentColor = sharedPreferences.getInt(KEY_BACKGROUND_COLOR, DEFAULT_COLOR)
+        val newColor = if (currentColor == DEFAULT_COLOR) TOGGLE_COLOR else DEFAULT_COLOR
 
+        binding.root.setBackgroundColor(newColor)
+        sharedPreferences.edit().putInt(KEY_BACKGROUND_COLOR, newColor).apply()
     }
 }

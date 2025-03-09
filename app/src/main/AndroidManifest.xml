@@ -16,10 +16,14 @@
         android:theme="@style/Theme.ArticleSearch"
         tools:targetApi="31">
         <activity android:name=".DetailActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:configChanges="orientation|screenSize"
+            android:screenOrientation="unspecified"/>
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:configChanges="orientation|screenSize"
+            android:screenOrientation="unspecified">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
