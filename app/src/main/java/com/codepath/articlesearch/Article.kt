@@ -10,6 +10,46 @@ data class SearchNewsResponse(
     @SerialName("response")
     val response: BaseResponse?
 )
+@Keep
+@Serializable
+data class MostPopularNewsResponse(
+    @SerialName("results")
+    val results: List<MostPopularArticle>? = emptyList()
+)
+
+@Keep
+@Serializable
+data class MostPopularArticle(
+    @SerialName("url")
+    val webUrl: String?,
+    @SerialName("published_date")
+    val pubDate: String?,
+    @SerialName("title")
+    val title: String?,
+    @SerialName("abstract")
+    val abstract: String?,
+    @SerialName("byline")
+    val byline: String?,
+    @SerialName("media")
+    val media: List<Media>?
+) : java.io.Serializable {
+    val mediaImageUrl: String?
+        get() = media?.firstOrNull()?.mediaMetadata?.lastOrNull()?.url
+}
+
+@Keep
+@Serializable
+data class Media(
+    @SerialName("media-metadata")
+    val mediaMetadata: List<MediaMetadata>?
+) : java.io.Serializable
+
+@Keep
+@Serializable
+data class MediaMetadata(
+    @SerialName("url")
+    val url: String?
+) : java.io.Serializable
 
 @Keep
 @Serializable

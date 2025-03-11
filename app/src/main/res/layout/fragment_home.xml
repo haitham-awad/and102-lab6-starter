@@ -1,46 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:gravity="top">
+    android:gravity="top"
+    android:background="?android:attr/colorBackground">
 
-    <!-- BIG HOME Text at the top -->
+    <!-- App Title -->
     <TextView
-        android:id="@+id/homeTextView"
-        android:layout_width="match_parent"
+        android:id="@+id/home_title"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="HOME"
-        android:textSize="50sp"
+        android:text="News Hub"
+        android:textSize="24sp"
         android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="32dp" />
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="8dp" />
 
-    <!-- Title of the article (optional) -->
+    <!-- Welcome Message -->
     <TextView
-        android:id="@+id/titleTextView2"
+        android:id="@+id/welcome_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bringing you the latest headlines."
+        android:textSize="16sp"
+        android:textColor="@android:color/darker_gray"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Featured Article Section (No Image) -->
+    <LinearLayout
+        android:id="@+id/featured_article_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Article Title"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        android:layout_marginBottom="16dp">
 
-    <!-- Abstract of the article (optional) -->
-    <TextView
-        android:id="@+id/abstractTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Article Abstract"
-        android:textSize="14sp"
-        android:layout_marginTop="8dp" />
+        <TextView
+            android:id="@+id/featured_article_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Featured Article Headline"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:textColor="@android:color/black" />
 
-    <!-- Image of the article (optional) -->
-    <ImageView
-        android:id="@+id/mediaImageView"
+        <TextView
+            android:id="@+id/featured_article_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="A short description of the featured article to give users a glimpse of the content."
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"
+            android:layout_marginTop="4dp" />
+
+    </LinearLayout>
+
+    <!-- RecyclerView for More Articles -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/article_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginTop="16dp"
-        android:scaleType="centerCrop" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        tools:listitem="@layout/item_article" />
 
 </LinearLayout>
